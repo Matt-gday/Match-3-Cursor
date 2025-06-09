@@ -1216,6 +1216,10 @@ body::before {
         gap: 8px;
         margin: 20px 0;
         padding: 15px;
+        width: 95vw;
+        max-width: 95vw;
+        margin-left: auto;
+        margin-right: auto;
     }
     
     .stat-item {
