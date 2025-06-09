@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jelly Crusher</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-ui">
+            <div class="ui-element">
+                <div class="label">Level</div>
+                <div class="value" id="level">1</div>
+            </div>
+            <div class="ui-element">
+                <div class="label">Score</div>
+                <div class="value" id="score">0</div>
+            </div>
+        </div>
+        
+        <div id="collection-ui-container">
+            <!-- Collection Goals taking full width -->
+            <div class="collection-ui-full-width">
+                <div class="collection-label">Goals</div>
+                <div id="collection-targets-compact">
+                    <!-- Collection goals will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="timer-container">
+            <div id="timer-bar"></div>
+            <!-- <div id="timer-text">180s</div> -->
+        </div>
+        
+        <div id="game-board-wrapper">
+            <div id="game-board"></div>
+            <div id="piece-container"></div>
+        </div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen">
+        <div class="start-screen-header">
+            <h1>JELLY CRUSHER</h1>
+        </div>
+        
+        <div class="game-instructions">
+            <div class="instruction-grid">
+                <div class="instruction-item">
+                    <div class="instruction-icon">🎯</div>
+                    <div class="instruction-text">
+                        <strong>Match 3+</strong> fruits to clear jelly tiles
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-icon">🍓</div>
+                    <div class="instruction-text">
+                        <strong>Collect</strong> required fruit amounts
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-icon">⏰</div>
+                    <div class="instruction-text">
+                        <strong>Clear ALL jelly</strong> before time runs out
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="start-button">🚀 BEGIN ADVENTURE 🚀</button>
+    </div>
+
+    <!-- Level Complete Screen -->
+    <div id="level-complete-screen" class="screen">
+        <div class="level-complete-header">
+            <h1 id="level-complete-title">🎉 LEVEL COMPLETE! 🎉</h1>
+            <p id="level-complete-message">Amazing work! All jelly cleared!</p>
+        </div>
+        
+        <div class="level-complete-stats">
+            <div class="stat-item">
+                <div class="stat-label">Level</div>
+                <div class="stat-value" id="completed-level">1</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="level-score">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Bonus</div>
+                <div class="stat-value" id="level-bonus">+0</div>
+            </div>
+        </div>
+        
+        <div id="level-complete-collections"></div>
+        
+        <button id="next-level-button">🚀 CONTINUE JOURNEY 🚀</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="screen">
+        <h1 id="game-over-title">⏰ TIME'S UP! ⏰</h1>
+        <p id="game-over-message">The jelly got you this time!</p>
+        <div id="final-stats">
+            <p>Final Score: <span id="final-score">0</span></p>
+            <p>Level Reached: <span id="final-level">1</span></p>
+        </div>
+        <div id="game-over-high-scores">
+            <h3>🏆 HIGH SCORES 🏆</h3>
+            <div id="game-over-high-scores-list">
+                <!-- High scores will be populated here -->
+            </div>
+        </div>
+        <button id="restart-button">🔄 TRY AGAIN 🔄</button>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="background-music" loop preload="auto">
+        <source src="music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html> 

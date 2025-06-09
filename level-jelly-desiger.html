@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match-3 Jelly Level Designer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        .container {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .level-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .export-btn {
+            background: #ff6b6b;
+        }
+        
+        .export-btn:hover {
+            background: #ff5252;
+        }
+        
+        .clear-btn {
+            background: #ffa726;
+        }
+        
+        .clear-btn:hover {
+            background: #ff9800;
+        }
+        
+        input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .grid-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 40px);
+            grid-template-rows: repeat(8, 40px);
+            gap: 2px;
+            background: #333;
+            padding: 5px;
+            border-radius: 10px;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        .tile {
+            width: 40px;
+            height: 40px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 4px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .tile:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .tile.jelly {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border-color: #ff4757;
+        }
+        
+        .stats {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .export-area {
+            margin-top: 20px;
+        }
+        
+        .export-output {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: #f8f9fa;
+            resize: vertical;
+        }
+        
+        .level-info {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar h3 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .thumbnail-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .thumbnail {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .thumbnail:hover {
+            background: #f8f9fa;
+            border-color: #4CAF50;
+        }
+        
+        .thumbnail.active {
+            background: #e8f5e8;
+            border-color: #4CAF50;
+        }
+        
+        .thumbnail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .thumbnail-level {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .thumbnail-count {
+            font-size: 12px;
+            color: #666;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 12px);
+            grid-template-rows: repeat(8, 12px);
+            gap: 1px;
+            background: #ddd;
+            padding: 2px;
+            border-radius: 4px;
+        }
+        
+        .thumbnail-tile {
+            width: 12px;
+            height: 12px;
+            background: #f8f8f8;
+            border-radius: 1px;
+        }
+        
+        .thumbnail-tile.jelly {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+        }
+        
+        .no-levels {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="sidebar">
+            <h3>🎯 Level Thumbnails</h3>
+            <div id="thumbnailContainer" class="thumbnail-container">
+                <div class="no-levels">No levels created yet.<br>Start designing!</div>
+            </div>
+        </div>
+        
+        <div class="container">
+        <h1>🍌 Match-3 Jelly Level Designer</h1>
+        
+        <div class="controls">
+            <div class="level-nav">
+                <button onclick="previousLevel()">← Previous</button>
+                <input type="number" id="levelInput" value="1" min="1" max="100" onchange="goToLevel()">
+                <button onclick="nextLevel()">Next →</button>
+            </div>
+            
+            <div>
+                <button class="clear-btn" onclick="clearLevel()">Clear Level</button>
+                <button class="export-btn" onclick="exportDesigns()">Export All Levels</button>
+            </div>
+        </div>
+        
+        <div class="level-info">
+            Level <span id="currentLevel">1</span>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 15px; color: #666; font-size: 14px;">
+            💡 <strong>Tip:</strong> Click individual tiles or click & drag to paint multiple tiles at once!
+        </div>
+        
+        <div class="grid-container">
+            <div class="grid" id="gameGrid"></div>
+        </div>
+        
+        <div class="stats">
+            <strong>Jelly Tiles: <span id="jellyCount">0</span> / 64</strong>
+        </div>
+        
+        <div class="export-area">
+            <h3>Export Data:</h3>
+            <textarea id="exportOutput" class="export-output" readonly placeholder="Click 'Export All Levels' to generate the level data..."></textarea>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let currentLevel = 1;
+        let levelDesigns = {}; // Store all level designs
+        
+        // Drawing state
+        let isDrawing = false;
+        let drawMode = null; // 'add' or 'remove'
+        
+        // Initialize the grid
+        function initializeGrid() {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.dataset.row = row;
+                    tile.dataset.col = col;
+                    
+                    // Add event listeners for drawing (mouse)
+                    tile.addEventListener('mousedown', (e) => startDrawing(e, row, col));
+                    tile.addEventListener('mouseenter', () => continueDrawing(row, col));
+                    tile.addEventListener('mouseup', stopDrawing);
+                    
+                    // Add touch event listeners for mobile
+                    tile.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        startDrawing(e, row, col);
+                    });
+                    tile.addEventListener('touchmove', (e) => {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                        if (element && element.dataset.row && element.dataset.col) {
+                            continueDrawing(parseInt(element.dataset.row), parseInt(element.dataset.col));
+                        }
+                    });
+                    tile.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        stopDrawing();
+                    });
+                    
+                    // Prevent default drag behavior
+                    tile.addEventListener('dragstart', (e) => e.preventDefault());
+                    tile.addEventListener('selectstart', (e) => e.preventDefault());
+                    
+                    tile.textContent = 'J';
+                    grid.appendChild(tile);
+                }
+            }
+            
+            // Add global mouse up listener to handle drawing outside grid
+            document.addEventListener('mouseup', stopDrawing);
+            document.addEventListener('touchend', stopDrawing);
+            
+            loadLevel(currentLevel);
+        }
+        
+        // Start drawing mode
+        function startDrawing(e, row, col) {
+            e.preventDefault();
+            isDrawing = true;
+            
+            const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            
+            // Determine draw mode based on current tile state
+            if (tile.classList.contains('jelly')) {
+                drawMode = 'remove';
+                tile.classList.remove('jelly');
+            } else {
+                drawMode = 'add';
+                tile.classList.add('jelly');
+            }
+            
+            saveCurrentLevel();
+            updateStats();
+        }
+        
+        // Continue drawing while mouse is held down
+        function continueDrawing(row, col) {
+            if (!isDrawing || drawMode === null) return;
+            
+            const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            
+            if (drawMode === 'add') {
+                tile.classList.add('jelly');
+            } else if (drawMode === 'remove') {
+                tile.classList.remove('jelly');
+            }
+            
+            saveCurrentLevel();
+            updateStats();
+        }
+        
+        // Stop drawing mode
+        function stopDrawing() {
+            isDrawing = false;
+            drawMode = null;
+        }
+        
+        // Toggle a tile's jelly status (for individual clicks)
+        function toggleTile(row, col) {
+            const tile = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            tile.classList.toggle('jelly');
+            
+            saveCurrentLevel();
+            updateStats();
+        }
+        
+        // Save current level design
+        function saveCurrentLevel() {
+            const design = [];
+            document.querySelectorAll('.tile.jelly').forEach(tile => {
+                design.push({
+                    row: parseInt(tile.dataset.row),
+                    col: parseInt(tile.dataset.col)
+                });
+            });
+            levelDesigns[currentLevel] = design;
+            updateThumbnails();
+        }
+        
+        // Load a specific level
+        function loadLevel(level) {
+            currentLevel = level;
+            document.getElementById('currentLevel').textContent = level;
+            document.getElementById('levelInput').value = level;
+            
+            // Clear all tiles
+            document.querySelectorAll('.tile').forEach(tile => {
+                tile.classList.remove('jelly');
+            });
+            
+            // Load saved design if it exists
+            if (levelDesigns[level]) {
+                levelDesigns[level].forEach(pos => {
+                    const tile = document.querySelector(`[data-row="${pos.row}"][data-col="${pos.col}"]`);
+                    if (tile) tile.classList.add('jelly');
+                });
+            }
+            
+            updateStats();
+            updateThumbnailActive();
+        }
+        
+        // Update active thumbnail
+        function updateThumbnailActive() {
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+                if (parseInt(thumb.dataset.level) === currentLevel) {
+                    thumb.classList.add('active');
+                }
+            });
+        }
+        
+        // Navigation functions
+        function nextLevel() {
+            saveCurrentLevel();
+            loadLevel(currentLevel + 1);
+        }
+        
+        function previousLevel() {
+            if (currentLevel > 1) {
+                saveCurrentLevel();
+                loadLevel(currentLevel - 1);
+            }
+        }
+        
+        function goToLevel() {
+            const input = document.getElementById('levelInput');
+            const level = parseInt(input.value);
+            if (level >= 1 && level <= 100) {
+                saveCurrentLevel();
+                loadLevel(level);
+            }
+        }
+        
+        // Clear current level
+        function clearLevel() {
+            if (confirm('Clear all jelly from this level?')) {
+                document.querySelectorAll('.tile').forEach(tile => {
+                    tile.classList.remove('jelly');
+                });
+                saveCurrentLevel();
+                updateStats();
+            }
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const jellyCount = document.querySelectorAll('.tile.jelly').length;
+            document.getElementById('jellyCount').textContent = jellyCount;
+        }
+        
+        // Create thumbnail for a level
+        function createThumbnail(level, design) {
+            const thumbnail = document.createElement('div');
+            thumbnail.className = 'thumbnail';
+            thumbnail.dataset.level = level;
+            thumbnail.onclick = () => {
+                saveCurrentLevel();
+                loadLevel(parseInt(level));
+            };
+            
+            const header = document.createElement('div');
+            header.className = 'thumbnail-header';
+            
+            const levelLabel = document.createElement('div');
+            levelLabel.className = 'thumbnail-level';
+            levelLabel.textContent = `Level ${level}`;
+            
+            const count = document.createElement('div');
+            count.className = 'thumbnail-count';
+            count.textContent = `${design.length} tiles`;
+            
+            header.appendChild(levelLabel);
+            header.appendChild(count);
+            
+            const grid = document.createElement('div');
+            grid.className = 'thumbnail-grid';
+            
+            // Create 8x8 mini grid
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'thumbnail-tile';
+                    
+                    // Check if this position has jelly
+                    const hasJelly = design.some(pos => pos.row === row && pos.col === col);
+                    if (hasJelly) {
+                        tile.classList.add('jelly');
+                    }
+                    
+                    grid.appendChild(tile);
+                }
+            }
+            
+            thumbnail.appendChild(header);
+            thumbnail.appendChild(grid);
+            
+            return thumbnail;
+        }
+        
+        // Update all thumbnails
+        function updateThumbnails() {
+            const container = document.getElementById('thumbnailContainer');
+            container.innerHTML = '';
+            
+            const levels = Object.keys(levelDesigns).filter(level => levelDesigns[level].length > 0);
+            
+            if (levels.length === 0) {
+                const noLevels = document.createElement('div');
+                noLevels.className = 'no-levels';
+                noLevels.innerHTML = 'No levels created yet.<br>Start designing!';
+                container.appendChild(noLevels);
+                return;
+            }
+            
+            // Sort levels numerically
+            levels.sort((a, b) => parseInt(a) - parseInt(b));
+            
+            levels.forEach(level => {
+                const thumbnail = createThumbnail(level, levelDesigns[level]);
+                if (parseInt(level) === currentLevel) {
+                    thumbnail.classList.add('active');
+                }
+                container.appendChild(thumbnail);
+            });
+        }
+        
+        // Export all level designs
+        function exportDesigns() {
+            saveCurrentLevel(); // Save current level before export
+            
+            const exportData = {
+                gameTitle: "Match-3 Jelly Patterns",
+                gridSize: "8x8",
+                totalLevels: Object.keys(levelDesigns).length,
+                levels: {}
+            };
+            
+            // Convert to more readable format
+            Object.keys(levelDesigns).sort((a, b) => parseInt(a) - parseInt(b)).forEach(level => {
+                const design = levelDesigns[level];
+                const grid = Array(8).fill().map(() => Array(8).fill('.'));
+                
+                design.forEach(pos => {
+                    grid[pos.row][pos.col] = 'J';
+                });
+                
+                exportData.levels[level] = {
+                    jellyCount: design.length,
+                    pattern: grid.map(row => row.join(' ')).join('\n'),
+                    coordinates: design
+                };
+            });
+            
+            const output = `// Match-3 Jelly Level Patterns
+// Generated by Level Designer
+// Grid: 8x8, J = Jelly tile, . = Empty tile
+
+${JSON.stringify(exportData, null, 2)}
+
+// Quick Reference:
+// Total levels designed: ${Object.keys(levelDesigns).length}
+// Levels with jelly: ${Object.keys(levelDesigns).filter(level => levelDesigns[level].length > 0).join(', ')}
+
+// Usage Instructions:
+// Each level contains:
+// - jellyCount: Total number of jelly tiles
+// - pattern: Visual grid representation 
+// - coordinates: Array of {row, col} positions for jelly tiles
+// Coordinates are 0-indexed (0-7 for both row and col)`;
+
+            document.getElementById('exportOutput').value = output;
+        }
+        
+        // Initialize the app
+        initializeGrid();
+        updateThumbnails();
+    </script>
+</body>
+</html>
