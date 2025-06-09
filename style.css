@@ -895,6 +895,60 @@ body::before {
     .ui-element .value {
         font-size: 1.3rem;
     }
+    
+    /* Mobile Safari Performance Optimizations */
+    .piece {
+        /* Disable heavy effects for mobile */
+        filter: none !important;
+        text-shadow: none !important;
+        background: none !important;
+        transition: top 0.3s ease, left 0.3s ease !important;
+        transform: translateZ(0); /* Force hardware acceleration */
+        will-change: top, left; /* Optimize for position changes */
+    }
+    
+    .piece:hover {
+        transform: none !important;
+        filter: none !important;
+    }
+    
+    /* Disable complex animations on mobile */
+    .piece.rocket-v, .piece.rocket-h,
+    .piece[data-special="BOMB"],
+    .piece[data-special="COLOR_BOMB"] {
+        animation: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Simplify match animations */
+    .piece.matched {
+        animation: simpleMobileMatch 0.3s ease-out forwards !important;
+    }
+    
+    @keyframes simpleMobileMatch {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(0.5); opacity: 0; }
+    }
+    
+    /* Disable particle effects and score popups on mobile */
+    .explosion-particle,
+    .score-popup {
+        display: none !important;
+    }
+    
+    /* Disable complex background effects */
+    body::before {
+        display: none !important;
+    }
+    
+    .tile.jellied {
+        animation: none !important;
+        box-shadow: 0 0 3px rgba(255, 105, 180, 0.5) !important;
+    }
+    
+    .tile.jellied::before {
+        display: none !important;
+    }
 }
 
 /* --- Collection Goals Section --- */

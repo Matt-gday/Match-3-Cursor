@@ -9,9 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const INITIAL_TIME = 180; // 240 seconds for level 1 (4 minutes)
     const TIME_DECREASE_PER_LEVEL = 5; // 5 seconds less each level
     const MIN_TIME = 20; // Minimum time (20 seconds)
-    const SWAP_ANIMATION_MS = 350;
-    const FALL_ANIMATION_MS = 500;
-    const MATCH_ANIMATION_MS = 600;
+    
+    // Mobile detection and performance optimization
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const SWAP_ANIMATION_MS = isMobile ? 200 : 350;
+    const FALL_ANIMATION_MS = isMobile ? 250 : 500;
+    const MATCH_ANIMATION_MS = isMobile ? 300 : 600;
 
     let board = [];
     let jelliedTiles = new Set();
@@ -236,6 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showScorePopup(points, x, y) {
+        // Skip score popups on mobile for performance
+        if (isMobile) return;
+        
         const popup = document.createElement('div');
         popup.className = 'score-popup';
         popup.textContent = `+${points}`;
@@ -1280,7 +1286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         board[emptyRow][c] = piece;
                         board[r][c] = null;
                         piece.el.classList.add('fall');
-                        piece.el.style.top = `${emptyRow * (TILE_SIZE + TILE_GAP)}px`;
+                        piece.el.style.top = `${emptyRow * (TILE_SIZE + TILE_GAP) - 1}px`;
                         piece.el.dataset.r = emptyRow;
                         
                         // Removed the buzzy fall sound for a cleaner audio experience
@@ -1293,9 +1299,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Don't wait for animation if we're checking for matches immediately
         if (hasCascaded) {
             // Let animation start but don't block the game logic
+            // Use shorter timeout on mobile for faster gameplay
+            const animationTimeout = isMobile ? FALL_ANIMATION_MS / 2 : FALL_ANIMATION_MS;
             setTimeout(() => {
                 document.querySelectorAll('.piece.fall').forEach(el => el.classList.remove('fall'));
-            }, FALL_ANIMATION_MS);
+            }, animationTimeout);
         }
         
         return hasCascaded;
@@ -1338,7 +1346,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         el: null 
                     };
                     const pieceEl = createPieceElement(r, c, pieceData, true);
-                    pieceEl.style.top = `-${newPieceCount * (TILE_SIZE + TILE_GAP)}px`;
+                    pieceEl.style.top = `-${newPieceCount * (TILE_SIZE + TILE_GAP) - 1}px`;
                     pieceContainerEl.appendChild(pieceEl);
                     pieceData.el = pieceEl;
                     board[r][c] = pieceData;
@@ -1346,7 +1354,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Start animation immediately but don't wait for it
                     requestAnimationFrame(() => {
                         pieceEl.classList.add('fall');
-                        pieceEl.style.top = `${r * (TILE_SIZE + TILE_GAP)}px`;
+                        pieceEl.style.top = `${r * (TILE_SIZE + TILE_GAP) - 1}px`;
                     });
                     
                     // Removed the buzzy fall sound for smoother audio experience
@@ -1357,9 +1365,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Don't wait for animation if we're checking for matches immediately
         if (hasRefilled) {
             // Let animation complete in background
+            // Use shorter timeout on mobile for faster gameplay
+            const animationTimeout = isMobile ? FALL_ANIMATION_MS / 2 : FALL_ANIMATION_MS;
             setTimeout(() => {
                 document.querySelectorAll('.piece.fall').forEach(el => el.classList.remove('fall'));
-            }, FALL_ANIMATION_MS);
+            }, animationTimeout);
         }
         
         return hasRefilled;
